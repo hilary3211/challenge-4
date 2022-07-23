@@ -1,28 +1,24 @@
 'reach 0.1'
 export const main = Reach.App(() => {
-    const Alice = Participant('Alice', {
-        ready: Fun([], Null)
+    const Hilary = Participant('Hilary', {
+        start: Fun([], Null),
     })
-    const Bobs = API('Bobs', {
-        newacc: Fun([], Null)
+    const users = API('users', {
+        users_connect: Fun([], UInt),
     })
     init()
-
-    Alice.only(() => {
-        interact.ready()
-    })
-    const amt = 0
-    Alice.publish()
-
-    const [num_of_users] =
+    Hilary.interact.start()
+    Hilary.publish()
+    const [counter] =
         parallelReduce([0])
-            .invariant(balance() == amt)
-            .while(num_of_users < 5)
-            .api(Bobs.newacc,
-                (k) => {
-                    k(null);
-                    return [num_of_users + 1];
+            .invariant(balance() == 0)
+            .while(counter < 5)
+            .api(users.users_connect,
+                (done) => {
+                    done(counter);
+                    return [counter + 1];
                 })
 
     commit()
+    exit()
 })
