@@ -3,63 +3,37 @@ import * as backend from './build/index.main.mjs';
 
 const stdlib = loadStdlib();
 const startingBalance = stdlib.parseCurrency(100);
+const Hilaryacc = await stdlib.newTestAccount(startingBalance);
+const Usersacc = await stdlib.newTestAccounts(7, startingBalance);
+const Hilaryctc = Hilaryacc.contract(backend);
+console.log('Welcome Hilary and Users')
 
-const accAlice = await stdlib.newTestAccount(startingBalance);
-const accBob = await stdlib.newTestAccount(startingBalance);
-const [one, two, three, four, five] =
-    await stdlib.newTestAccounts(5, startingBalance);
-const ctcAlice = accAlice.contract(backend);
-
-const users = []
-/*const startbobs = async () => {
-    const newbob = async (who) => {
-        const acc = await stdlib.newTestAccount(startingBalance);
-        const ctc = acc.contract(backend, ctcAlice.getInfo())
-        users.push(acc.getAddress())
-    }
-    await newbob('bob')
-    await newbob('bob2')
-
-    console.log(users)
-}*/
-const newacc = async (whoi) => {
+const users_connect = async (num) => {
     try {
-        const ctc = whoi.contract(backend, ctcAlice.getInfo());
-        const checks = await ctc.apis.Bobs.newacc();
-        //users.push(whoi.getAddress())
-        console.log(`${whoi} has successfully connected`);
+        const acc = Usersacc[num]
+        const user_address = acc.getAddress()
+        const ctc = acc.contract(backend, Hilaryctc.getInfo());
+        const counts = await ctc.apis.users.users_connect();
+        console.log(` Account ${counts}'s account : ${user_address} has connected`)
     } catch (error) {
-        console.log(error);
+        console.log('Connection closed')
     }
-};
-/*await Promise.all([
-    await ctcAlice.p.Alice({
-        ready: () => {
-            console.log('Alice is ready')
-        },
+
+}
+
+await Promise.all([
+    Hilaryctc.p.Hilary({
+        start: () => {
+            console.log('Hilary has started account connection')
+        }
     }),
-    await newacc(one),
-    await newacc(two),
-    await newacc(three),
-    await newacc(four),
-    await newacc(five),
-
-])*/
-
-await ctcAlice.p.Alice({
-    ready: () => {
-        console.log('Alice is ready')
-    },
-    /*await newacc(one)
-    await newacc(two)
-    await newacc(three)
-    await newacc(four)
-    await newacc(five)*/
-})
-
-await newacc(one)
-await newacc(two)
-await newacc(three)
-await newacc(four)
-await newacc(five)
-console.log('Good bye guys')
+    await users_connect(0),
+    await users_connect(1),
+    await users_connect(2),
+    await users_connect(3),
+    await users_connect(4),
+    await users_connect(5),
+    await users_connect(6),
+    await users_connect(7),
+    process.exit()
+]);
